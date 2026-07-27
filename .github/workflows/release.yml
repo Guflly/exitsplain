@@ -30,7 +30,7 @@ jobs:
             archive: exitsplain-macos-aarch64.tar.gz
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build
         run: cargo build --release --locked --target ${{ matrix.target }}
@@ -57,7 +57,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
