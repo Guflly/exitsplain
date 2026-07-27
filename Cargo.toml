@@ -1,0 +1,20 @@
+[package]
+name = "exitsplain"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Explain failed commands with deterministic, offline rules."
+license = "MIT"
+repository = "https://github.com/Guflly/exitsplain"
+keywords = ["cli", "debugging", "errors", "developer-tools"]
+categories = ["command-line-utilities", "development-tools::debugging"]
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+regex = "1.11"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+lto = "thin"
+strip = true

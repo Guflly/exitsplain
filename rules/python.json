@@ -1,0 +1,81 @@
+{
+  "name": "python",
+  "description": "Python and pip failures.",
+  "rules": [
+    {
+      "id": "python-module-not-found",
+      "title": "Python cannot import a module",
+      "summary": "The active interpreter cannot find the requested module on sys.path.",
+      "confidence": 96,
+      "matchers": {
+        "all": [],
+        "any": ["ModuleNotFoundError: No module named", "ImportError: No module named"],
+        "none": []
+      },
+      "causes": ["The dependency is not installed in the active environment.", "pip and python point to different interpreters.", "The import name differs from the package name."],
+      "actions": ["Check which python executable is running and whether its virtual environment is active.", "Use that interpreter's python -m pip to inspect installed packages.", "Confirm the documented import name."],
+      "docs": ["https://docs.python.org/3/tutorial/modules.html#the-module-search-path"],
+      "tags": ["python", "modules"]
+    },
+    {
+      "id": "python-externally-managed-environment",
+      "title": "Python marked this environment as externally managed",
+      "summary": "The operating system owns this Python installation and blocks global pip changes.",
+      "confidence": 99,
+      "matchers": {
+        "all": [],
+        "any": ["externally-managed-environment", "This environment is externally managed"],
+        "none": []
+      },
+      "causes": ["The distribution protects system Python packages from pip.", "The command is running outside a virtual environment."],
+      "actions": ["Create and activate a virtual environment for the project.", "Use the operating system package manager only for system-wide packages.", "Avoid --break-system-packages unless you fully own the environment."],
+      "docs": ["https://packaging.python.org/en/latest/specifications/externally-managed-environments/", "https://docs.python.org/3/tutorial/venv.html"],
+      "tags": ["python", "pip", "environment"]
+    },
+    {
+      "id": "pip-no-matching-distribution",
+      "title": "pip found no compatible distribution",
+      "summary": "The index has no release matching the requested version and current platform constraints.",
+      "confidence": 95,
+      "matchers": {
+        "all": [],
+        "any": ["Could not find a version that satisfies the requirement", "No matching distribution found for"],
+        "none": []
+      },
+      "causes": ["The package name or version is wrong.", "No wheel supports the current Python, operating system, or CPU.", "The configured package index does not contain the release."],
+      "actions": ["Confirm the package name and available versions on the configured index.", "Check the active Python version and platform tags.", "Inspect proxy or private-index configuration if a known release is missing."],
+      "docs": ["https://pip.pypa.io/en/stable/cli/pip_debug/"],
+      "tags": ["python", "pip", "dependencies"]
+    },
+    {
+      "id": "python-version-requirement",
+      "title": "The package does not support this Python version",
+      "summary": "Package metadata excludes the active Python interpreter.",
+      "confidence": 94,
+      "matchers": {
+        "all": [],
+        "any": ["requires a different Python", "Package '.+' requires a different Python", "Ignored the following versions that require a different python version"],
+        "none": []
+      },
+      "causes": ["The project is using an older or newer Python than the package supports.", "A resolver selected a release with incompatible Requires-Python metadata."],
+      "actions": ["Compare python --version with the project's requires-python declaration.", "Use a supported interpreter or select a compatible package release."],
+      "docs": ["https://packaging.python.org/en/latest/specifications/core-metadata/#requires-python"],
+      "tags": ["python", "pip", "toolchain"]
+    },
+    {
+      "id": "python-venv-ensurepip-missing",
+      "title": "Python cannot create a virtual environment",
+      "summary": "The interpreter was installed without the ensurepip or venv components.",
+      "confidence": 91,
+      "matchers": {
+        "all": ["ensurepip"],
+        "any": ["not available", "No module named ensurepip", "install the python3-venv package"],
+        "none": []
+      },
+      "causes": ["The operating system splits venv support into a separate package.", "This Python build intentionally omitted ensurepip."],
+      "actions": ["Install the venv component that matches the exact Python version using the operating system's package manager.", "Recreate the virtual environment after the component is installed."],
+      "docs": ["https://docs.python.org/3/library/venv.html"],
+      "tags": ["python", "environment", "toolchain"]
+    }
+  ]
+}

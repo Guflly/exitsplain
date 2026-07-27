@@ -1,0 +1,19 @@
+name: Bug report
+description: Report a crash, missed match, or incorrect explanation
+body:
+  - type: textarea
+    attributes:
+      label: Synthetic example
+      description: Remove real paths, names, tokens, and customer data.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: exitsplain version and OS
+    validations:
+      required: true

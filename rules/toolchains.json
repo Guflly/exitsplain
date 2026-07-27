@@ -1,0 +1,66 @@
+{
+  "name": "toolchains",
+  "description": "Compiled language and build tool failures.",
+  "rules": [
+    {
+      "id": "rust-linker-missing",
+      "title": "Rust cannot find the system linker",
+      "summary": "rustc produced objects, but the native linker or C toolchain is unavailable.",
+      "confidence": 94,
+      "matchers": {
+        "all": ["linker .+ not found|linking with .+ failed"],
+        "any": ["No such file or directory", "program not found", "could not exec the linker"],
+        "none": []
+      },
+      "causes": ["The platform C/C++ build tools are missing.", "A custom linker setting points to an unavailable executable."],
+      "actions": ["Install the supported native build tools for the Rust target.", "Inspect target-specific linker settings in Cargo and environment configuration."],
+      "docs": ["https://doc.rust-lang.org/rustc/codegen-options/index.html#linker"],
+      "tags": ["rust", "toolchain", "native"]
+    },
+    {
+      "id": "go-missing-sum-entry",
+      "title": "go.sum is missing a required module entry",
+      "summary": "The module graph needs a checksum that is absent from the committed go.sum file.",
+      "confidence": 98,
+      "matchers": {
+        "all": [],
+        "any": ["missing go\\.sum entry for module providing package", "updates to go\\.mod needed; to update it"],
+        "none": []
+      },
+      "causes": ["A dependency import changed without updating module metadata.", "Readonly module mode is active in CI."],
+      "actions": ["Use the repository's expected Go version.", "Run the suggested go mod command in a trusted checkout, review go.mod and go.sum, and commit the intended changes."],
+      "docs": ["https://go.dev/ref/mod#go-mod-file-updates"],
+      "tags": ["go", "dependencies", "lockfile"]
+    },
+    {
+      "id": "java-class-version-mismatch",
+      "title": "The Java runtime is older than the compiled classes",
+      "summary": "The class-file version was produced by a newer Java release than the active runtime supports.",
+      "confidence": 99,
+      "matchers": {
+        "all": [],
+        "any": ["UnsupportedClassVersionError", "class file version .+, this version of the Java Runtime only recognizes"],
+        "none": []
+      },
+      "causes": ["Build and runtime jobs use different Java releases.", "A dependency was compiled for a newer Java baseline."],
+      "actions": ["Compare java -version and javac -version in the failing environment.", "Run with a compatible newer JRE, or compile the project and dependencies for the intended target release."],
+      "docs": ["https://docs.oracle.com/javase/specs/jvms/se25/html/jvms-4.html"],
+      "tags": ["java", "toolchain"]
+    },
+    {
+      "id": "gradle-java-home-invalid",
+      "title": "Gradle cannot use the configured Java home",
+      "summary": "JAVA_HOME or Gradle's Java installation path does not point to a usable JDK.",
+      "confidence": 96,
+      "matchers": {
+        "all": [],
+        "any": ["JAVA_HOME is set to an invalid directory", "Supplied javaHome is not a valid folder", "org\\.gradle\\.java\\.home.*invalid"],
+        "none": []
+      },
+      "causes": ["The JDK moved or was removed.", "JAVA_HOME points to a JRE, executable, or version-specific path that no longer exists."],
+      "actions": ["Locate the intended JDK root and confirm its bin/java executable works.", "Update the narrow project or shell setting that supplied the stale path."],
+      "docs": ["https://docs.gradle.org/current/userguide/compatibility.html"],
+      "tags": ["java", "gradle", "toolchain"]
+    }
+  ]
+}

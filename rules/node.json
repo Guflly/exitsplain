@@ -1,0 +1,96 @@
+{
+  "name": "node",
+  "description": "Node.js and npm failures.",
+  "rules": [
+    {
+      "id": "node-module-not-found",
+      "title": "Node.js cannot resolve a module",
+      "summary": "The requested package or file is absent from the active module-resolution path.",
+      "confidence": 95,
+      "matchers": {
+        "all": [],
+        "any": ["Cannot find module", "ERR_MODULE_NOT_FOUND", "Cannot find package '.+' imported from"],
+        "none": []
+      },
+      "causes": ["Dependencies were not installed for this workspace.", "The import name or relative path is wrong.", "A build step did not generate the expected file."],
+      "actions": ["Read the missing module name from the first error.", "Confirm it is declared in the correct package and workspace.", "For relative imports, verify filename case and the built output path."],
+      "docs": ["https://nodejs.org/api/modules.html#loading-from-node_modules-folders"],
+      "tags": ["node", "modules"]
+    },
+    {
+      "id": "npm-peer-dependency-conflict",
+      "title": "npm found incompatible peer dependencies",
+      "summary": "Two packages require peer versions that cannot be selected together.",
+      "confidence": 97,
+      "matchers": {
+        "all": [],
+        "any": ["npm ERR! code ERESOLVE", "unable to resolve dependency tree", "conflicting peer dependency"],
+        "none": []
+      },
+      "causes": ["A package upgrade crossed a peer-dependency boundary.", "The root project pins a version outside a plugin's supported range."],
+      "actions": ["Read both conflicting version ranges in the ERESOLVE report.", "Choose package versions whose peer ranges overlap.", "Avoid --force or --legacy-peer-deps unless you have verified runtime compatibility."],
+      "docs": ["https://docs.npmjs.com/cli/v11/configuring-npm/package-json#peerdependencies"],
+      "tags": ["node", "npm", "dependencies"]
+    },
+    {
+      "id": "npm-unsupported-engine",
+      "title": "The active Node.js version is unsupported",
+      "summary": "A package's engines or devEngines requirement does not include the current runtime.",
+      "confidence": 94,
+      "matchers": {
+        "all": [],
+        "any": ["\\bEBADENGINE\\b", "Unsupported engine", "The engine \"node\" is incompatible"],
+        "none": []
+      },
+      "causes": ["The terminal is using a different Node.js version than the project.", "A dependency dropped support for the current major version."],
+      "actions": ["Compare node --version with package.json and the repository's version files.", "Switch to a supported runtime, or select a dependency release that supports the required runtime."],
+      "docs": ["https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines"],
+      "tags": ["node", "npm", "toolchain"]
+    },
+    {
+      "id": "npm-lockfile-out-of-sync",
+      "title": "package.json and the lockfile disagree",
+      "summary": "npm ci requires package-lock.json to exactly represent package.json.",
+      "confidence": 98,
+      "matchers": {
+        "all": ["npm ci|npm error code EUSAGE"],
+        "any": ["package-lock\\.json.*not in sync", "can only install packages when your package\\.json and package-lock\\.json", "Missing: .+ from lock file"],
+        "none": []
+      },
+      "causes": ["package.json changed without committing the regenerated lockfile.", "A merge resolved the manifest and lockfile inconsistently."],
+      "actions": ["Use the repository's expected npm version.", "Run npm install once to update the lockfile, review the diff, and commit both files together."],
+      "docs": ["https://docs.npmjs.com/cli/v11/commands/npm-ci"],
+      "tags": ["node", "npm", "lockfile"]
+    },
+    {
+      "id": "node-gyp-toolchain-missing",
+      "title": "node-gyp cannot find a native build toolchain",
+      "summary": "A native Node.js addon needs a supported compiler, Python, and platform build tools.",
+      "confidence": 88,
+      "matchers": {
+        "all": ["node-gyp|gyp ERR!"],
+        "any": ["Could not find any Visual Studio installation", "make: .+: (Command not found|not found)", "No Xcode or CLT version detected", "not found: make", "C\\+\\+ build tools"],
+        "none": []
+      },
+      "causes": ["The platform compiler toolchain is not installed.", "node-gyp selected an unsupported Python or compiler version."],
+      "actions": ["Install the platform prerequisites listed by node-gyp for your operating system.", "Check the package's supported Node.js and ABI versions before building from source."],
+      "docs": ["https://github.com/nodejs/node-gyp#installation"],
+      "tags": ["node", "native", "toolchain"]
+    },
+    {
+      "id": "npm-install-script-not-approved",
+      "title": "An npm install script is not approved",
+      "summary": "npm blocked a dependency lifecycle script under the project's install-script policy.",
+      "confidence": 91,
+      "matchers": {
+        "all": [],
+        "any": ["install scripts?.*(not approved|blocked|denied)", "strict-allow-scripts", "allowScripts.*false"],
+        "none": []
+      },
+      "causes": ["The dependency has an install-time script that has not been reviewed.", "The package needs an implicit native rebuild."],
+      "actions": ["Inspect the package and the exact lifecycle script before approving it.", "Record an explicit allow or deny decision in the project policy.", "Do not bypass the policy for every dependency."],
+      "docs": ["https://docs.npmjs.com/cli/install/#allow-scripts"],
+      "tags": ["node", "npm", "security"]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "name": "universal",
+  "description": "Errors shared across operating systems and toolchains.",
+  "rules": [
+    {
+      "id": "port-already-in-use",
+      "title": "A port is already in use",
+      "summary": "Another process is listening on the address or port this command tried to bind.",
+      "confidence": 96,
+      "matchers": {
+        "all": [],
+        "any": ["EADDRINUSE", "address already in use", "Only one usage of each socket address"],
+        "none": []
+      },
+      "causes": ["A previous development server is still running.", "Two services are configured for the same port."],
+      "actions": ["Find the process listening on the reported port and confirm what it is.", "Stop that process if it is stale, or configure one service to use a different port."],
+      "docs": ["https://nodejs.org/api/errors.html#eaddrinuse-address-already-in-use"],
+      "tags": ["network", "runtime"]
+    },
+    {
+      "id": "permission-denied",
+      "title": "The process lacks permission",
+      "summary": "The operating system refused a file, directory, socket, or process operation.",
+      "confidence": 78,
+      "matchers": {
+        "all": [],
+        "any": ["permission denied", "\\bEACCES\\b", "EPERM: operation not permitted", "Access is denied"],
+        "none": []
+      },
+      "causes": ["The target belongs to another user or is read-only.", "Another process or security tool has locked the target.", "The command is writing outside the intended project directory."],
+      "actions": ["Inspect the exact path and its owner before changing permissions.", "Close processes that may hold the file, then retry.", "Prefer a user-owned project or cache directory instead of running the command as administrator."],
+      "docs": [],
+      "tags": ["filesystem", "permissions"]
+    },
+    {
+      "id": "disk-full",
+      "title": "The destination is out of space",
+      "summary": "The filesystem cannot accept more data or inodes.",
+      "confidence": 98,
+      "matchers": {
+        "all": [],
+        "any": ["\\bENOSPC\\b", "no space left on device", "not enough space on the disk"],
+        "none": []
+      },
+      "causes": ["The target disk is full.", "A temporary or container volume reached its limit.", "A Unix filesystem ran out of inodes."],
+      "actions": ["Check free space on the exact filesystem named in the error.", "Remove unneeded build artifacts or expand the correct volume.", "Retry only after confirming the destination has room."],
+      "docs": [],
+      "tags": ["filesystem", "runtime"]
+    },
+    {
+      "id": "command-not-found",
+      "title": "A required command is missing",
+      "summary": "The shell or parent process could not find an executable on PATH.",
+      "confidence": 92,
+      "matchers": {
+        "all": [],
+        "any": ["command not found", "is not recognized as an internal or external command", "executable file not found in", "The term '.+' is not recognized"],
+        "none": []
+      },
+      "causes": ["The tool is not installed.", "It is installed but its binary directory is not on PATH.", "A project-local tool should have been invoked through its package runner."],
+      "actions": ["Identify the missing command from the first error line.", "Install it from its official source or use the project-local runner.", "Open a new terminal after changing PATH."],
+      "docs": [],
+      "tags": ["shell", "toolchain"]
+    },
+    {
+      "id": "certificate-verification-failed",
+      "title": "TLS certificate verification failed",
+      "summary": "The client could not build a trusted certificate chain for the remote service.",
+      "confidence": 90,
+      "matchers": {
+        "all": [],
+        "any": ["certificate verify failed", "unable to get local issuer certificate", "self[- ]signed certificate in certificate chain", "CERT_HAS_EXPIRED"],
+        "none": []
+      },
+      "causes": ["The machine trust store is missing a required certificate.", "A corporate proxy is intercepting TLS.", "The remote certificate is expired or misconfigured."],
+      "actions": ["Check the system clock and the remote certificate first.", "Ask your network administrator for the correct CA certificate when a managed proxy is involved.", "Do not disable certificate verification as a workaround."],
+      "docs": ["https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port"],
+      "tags": ["network", "security", "tls"]
+    },
+    {
+      "id": "out-of-memory",
+      "title": "The process ran out of memory",
+      "summary": "The runtime or operating system could not allocate enough memory to continue.",
+      "confidence": 93,
+      "matchers": {
+        "all": [],
+        "any": ["heap out of memory", "cannot allocate memory", "fatal error: out of memory", "allocation failed - JavaScript heap"],
+        "none": []
+      },
+      "causes": ["The workload exceeds the current memory limit.", "A container or CI job has a lower limit than the local machine.", "A leak or unbounded input caused memory growth."],
+      "actions": ["Measure peak memory and inspect the first operation that grows without bound.", "Reduce concurrency or input size to confirm the cause.", "Increase a limit only after ruling out a leak."],
+      "docs": [],
+      "tags": ["performance", "runtime"]
+    }
+  ]
+}

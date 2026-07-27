@@ -1,0 +1,66 @@
+{
+  "name": "git",
+  "description": "Git failures.",
+  "rules": [
+    {
+      "id": "git-non-fast-forward",
+      "title": "The remote branch moved ahead",
+      "summary": "Git rejected the push because it would discard commits already on the remote branch.",
+      "confidence": 98,
+      "matchers": {
+        "all": [],
+        "any": ["non-fast-forward", "fetch first", "Updates were rejected because the remote contains work"],
+        "none": []
+      },
+      "causes": ["Someone else pushed to the branch.", "The local branch was rewritten or created from an older base."],
+      "actions": ["Fetch the remote and inspect the commits you are missing.", "Merge or rebase intentionally, resolve conflicts, then push again.", "Force-push only when the branch policy and collaborators explicitly allow history replacement."],
+      "docs": ["https://git-scm.com/docs/git-push#_note_about_fast_forwards"],
+      "tags": ["git", "collaboration"]
+    },
+    {
+      "id": "git-merge-conflict",
+      "title": "Git needs merge conflicts resolved",
+      "summary": "Both histories changed overlapping content and Git cannot choose a result.",
+      "confidence": 96,
+      "matchers": {
+        "all": [],
+        "any": ["CONFLICT \\(.+\\):", "Automatic merge failed; fix conflicts", "you need to resolve your current index first"],
+        "none": []
+      },
+      "causes": ["Two branches changed the same lines or file operation.", "A previous merge or rebase is still in progress."],
+      "actions": ["Run git status to list every conflicted path.", "Resolve each path based on intended behavior, then test before continuing.", "Abort the merge or rebase if it was started by mistake."],
+      "docs": ["https://git-scm.com/docs/git-merge#_how_conflicts_are_presented"],
+      "tags": ["git", "collaboration"]
+    },
+    {
+      "id": "git-dubious-ownership",
+      "title": "Git does not trust this repository owner",
+      "summary": "The repository directory is owned by another account, so Git disabled repository-local configuration.",
+      "confidence": 99,
+      "matchers": {
+        "all": [],
+        "any": ["detected dubious ownership in repository", "safe\\.directory"],
+        "none": []
+      },
+      "causes": ["A container, administrator, sandbox, or different user created the repository.", "The directory was copied with ownership metadata."],
+      "actions": ["Verify the repository path and owner before trusting it.", "Fix ownership when it is wrong.", "Use a narrowly scoped safe.directory entry only when the ownership difference is expected."],
+      "docs": ["https://git-scm.com/docs/git-config#Documentation/git-config.txt-safedirectory"],
+      "tags": ["git", "security", "permissions"]
+    },
+    {
+      "id": "git-authentication-failed",
+      "title": "Git authentication failed",
+      "summary": "The remote did not accept the supplied SSH key, token, or credential.",
+      "confidence": 94,
+      "matchers": {
+        "all": [],
+        "any": ["Permission denied \\(publickey\\)", "Authentication failed for", "could not read Username for", "HTTP Basic: Access denied"],
+        "none": []
+      },
+      "causes": ["The credential is expired, missing, or for a different account.", "The account lacks access to the repository.", "The remote URL uses a protocol that is not configured."],
+      "actions": ["Confirm the remote URL and intended account.", "Re-authenticate through the hosting provider's supported flow.", "Verify repository permission without placing tokens in the remote URL."],
+      "docs": ["https://docs.github.com/en/authentication/troubleshooting-ssh/error-permission-denied-publickey"],
+      "tags": ["git", "authentication", "security"]
+    }
+  ]
+}

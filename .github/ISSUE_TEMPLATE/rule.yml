@@ -1,0 +1,17 @@
+name: Rule request
+description: Propose a stable error signature
+body:
+  - type: input
+    attributes:
+      label: Tool
+      placeholder: cargo, pip, docker...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Synthetic error
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Official documentation

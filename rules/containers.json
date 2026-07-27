@@ -1,0 +1,51 @@
+{
+  "name": "containers",
+  "description": "Docker and container runtime failures.",
+  "rules": [
+    {
+      "id": "docker-daemon-unavailable",
+      "title": "The Docker daemon is unavailable",
+      "summary": "The client cannot reach the configured Docker engine.",
+      "confidence": 97,
+      "matchers": {
+        "all": [],
+        "any": ["Cannot connect to the Docker daemon", "error during connect: .+docker", "The system cannot find the file specified.*docker_engine"],
+        "none": []
+      },
+      "causes": ["Docker Desktop or the system daemon is not running.", "DOCKER_HOST points to an unavailable engine.", "The current user cannot access the daemon socket."],
+      "actions": ["Confirm the intended Docker engine is running.", "Inspect the active Docker context and DOCKER_HOST.", "Check socket permissions without making the socket world-writable."],
+      "docs": ["https://docs.docker.com/engine/daemon/troubleshoot/"],
+      "tags": ["docker", "containers"]
+    },
+    {
+      "id": "docker-container-name-conflict",
+      "title": "A container already uses that name",
+      "summary": "Docker requires container names to be unique, including stopped containers.",
+      "confidence": 99,
+      "matchers": {
+        "all": [],
+        "any": ["Conflict\\. The container name .+ is already in use", "container name .+ is already in use by container"],
+        "none": []
+      },
+      "causes": ["A previous container was stopped but not removed.", "Two compose projects or scripts chose the same fixed name."],
+      "actions": ["Inspect the existing container and confirm whether it should be reused.", "Remove or rename only that container if it is stale.", "Prefer generated compose names when a fixed container_name is unnecessary."],
+      "docs": ["https://docs.docker.com/reference/cli/docker/container/run/"],
+      "tags": ["docker", "containers"]
+    },
+    {
+      "id": "docker-port-already-allocated",
+      "title": "A published container port is already allocated",
+      "summary": "Docker cannot bind the requested host port because another listener owns it.",
+      "confidence": 98,
+      "matchers": {
+        "all": [],
+        "any": ["port is already allocated", "Bind for .+ failed: port is already allocated", "failed to bind host port"],
+        "none": []
+      },
+      "causes": ["Another container publishes the same host port.", "A local service is already listening there."],
+      "actions": ["List containers and host processes using the reported port.", "Stop the stale owner or publish this container on a different host port."],
+      "docs": ["https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/"],
+      "tags": ["docker", "containers", "network"]
+    }
+  ]
+}
